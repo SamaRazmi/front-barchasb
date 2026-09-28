@@ -1,0 +1,141 @@
+"use client";
+
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext"; // اضافه کردن import
+
+type Tool = {
+  id: number;
+  title: string;
+  description: string;
+  dark: boolean;
+  link: string;
+};
+
+const tools: Tool[] = [
+  {
+    id: 1,
+    title: " رزومه ساز ",
+    description: "ساخت رزومه حرفه‌ای در چند دقیقه",
+    dark: true,
+    link: "/dashboard/plugins/resume",
+  },
+  {
+    id: 2,
+    title: " آزمون ها ",
+    description: "ارزیابی مهارت‌ها با آزمون‌های تخصصی",
+    dark: false,
+    link: "/dashboard/plugins/tests",
+  },
+  {
+    id: 3,
+    title: " تبدیل ها ",
+    description: "ابزارهای کاربردی برای تبدیل فرمت‌ها",
+    dark: true,
+    link: "/dashboard/plugins/converter",
+  },
+];
+
+const ToolCard = ({ tool, onClick }: { tool: Tool; onClick: () => void }) => (
+  <div
+    onClick={onClick}
+    className={`flex flex-col gap-1 cursor-pointer
+    transition-all duration-300
+    shadow-sm hover:shadow-lg hover:-translate-y-1
+    px-4 py-3 md:px-5 md:py-4
+    rounded-[20px] border-[1.5px]
+    min-w-[150px]
+    ${
+      tool.dark
+        ? "bg-[#143A62] border-[#143A62] text-white"
+        : "bg-white border-[#143A62] text-[#143A62]"
+    }`}
+  >
+    <div className="flex items-center justify-end gap-4">
+      <span className="text-[13px] md:text-base font-bold whitespace-nowrap">
+        {tool.title}
+      </span>
+
+      <div
+        className={`w-8 h-8 md:w-9 md:h-9 rounded-full shrink-0 ${
+          tool.dark ? "bg-white" : "bg-[#143A62]"
+        }`}
+      />
+    </div>
+
+    <p
+      className={`text-[11px] leading-relaxed ${
+        tool.dark ? "text-white/70" : "text-[#143A62]/70"
+      }`}
+    >
+      {tool.description}
+    </p>
+  </div>
+);
+
+export default function ToolsSection() {
+  const router = useRouter();
+  // استفاده از useUser به جای useSelector
+  const { user, loading } = useUser();
+  const isLoggedIn = !!user;
+
+  const handleToolClick = (link: string) => {
+    if (isLoggedIn) {
+      router.push(link);
+    } else {
+      router.push("/login");
+    }
+  };
+
+  return (
+    <section className="w-full bg-[#f8f9fa] py-8 px-4" dir="rtl">
+      <div className="max-w-6xl mx-auto relative">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-extrabold text-[#143A62] mb-2">
+            ابزارهای کاربردی
+          </h2>
+          <p className="text-[#666] text-sm md:text-base">
+            از ابزارهای تخصصی ما برای پیشرفت در مسیر شغلی خود استفاده کنید
+          </p>
+        </div>
+
+        <div className="block md:hidden relative overflow-hidden">
+          <div
+            className="absolute left-[-2px] top-0 bottom-0 w-14 z-20 pointer-events-none 
+                  bg-gradient-to-r from-white via-white/80 to-transparent"
+          />
+
+          <Swiper
+            spaceBetween={12}
+            slidesPerView={2.3}
+            slidesOffsetBefore={16}
+            slidesOffsetAfter={16}
+            dir="rtl"
+          >
+            {tools.map((tool) => (
+              <SwiperSlide key={tool.id} className="py-2">
+                <ToolCard
+                  tool={tool}
+                  onClick={() => handleToolClick(tool.link)}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        <div className="hidden md:flex justify-center gap-6">
+          {tools.map((tool) => (
+            <ToolCard
+              key={tool.id}
+              tool={tool}
+              onClick={() => handleToolClick(tool.link)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
